@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meus Gastos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- TELA DE LOGIN / CADASTRO -->
+  <main id="tela-auth" class="app auth" hidden>
+    <h1>Meus gastos</h1>
+    <p class="sub">Entre ou crie sua conta para ver seus lançamentos.</p>
+    <section class="bloco">
+      <div class="abas" role="tablist">
+        <button type="button" role="tab" data-modo="entrar" aria-selected="true">Entrar</button>
+        <button type="button" role="tab" data-modo="criar" aria-selected="false">Criar conta</button>
+      </div>
+      <form id="form-auth">
+        <input type="email" id="email" placeholder="E-mail" autocomplete="email" required>
+        <input type="password" id="senha" placeholder="Senha (mínimo 6 caracteres)" minlength="6" autocomplete="current-password" required>
+        <p id="auth-erro" class="erro" role="alert"></p>
+        <button type="submit" id="auth-botao">Entrar</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- APLICATIVO (só aparece logado) -->
+  <main id="tela-app" class="app" hidden>
+    <header class="topo">
+      <h1>Meus gastos</h1>
+      <div class="usuario">
+        <span id="usuario-email"></span>
+        <button type="button" id="sair" class="remover">Sair</button>
+      </div>
+    </header>
+
+    <p id="aviso" class="erro" role="alert"></p>
+
+    <div class="mes-linha">
+      <label>
+        <span class="sr">Mês</span>
+        <input type="month" id="mes">
+      </label>
+    </div>
+
+    <section class="resumo" aria-label="Resumo do mês">
+      <div class="saldo">
+        <span>Saldo do mês</span>
+        <strong id="saldo">R$ 0,00</strong>
+      </div>
+      <div class="par">
+        <div><span>Receitas</span><strong id="receitas" class="pos">R$ 0,00</strong></div>
+        <div><span>Despesas</span><strong id="despesas" class="neg">R$ 0,00</strong></div>
+      </div>
+    </section>
+
+    <!-- CRUD 1: LANÇAMENTOS -->
+    <section class="bloco">
+      <h2>Novo lançamento</h2>
+      <form id="form-lanc">
+        <div class="tipo" role="radiogroup" aria-label="Tipo">
+          <label><input type="radio" name="tipo" value="despesa" checked><span>Despesa</span></label>
+          <label><input type="radio" name="tipo" value="receita"><span>Receita</span></label>
+        </div>
+        <input type="text" id="descricao" placeholder="Descrição (ex.: mercado)" maxlength="60" required>
+        <div class="linha">
+          <input type="number" id="valor" placeholder="Valor (R$)" min="0.01" step="0.01" required>
+          <input type="date" id="data" required>
+        </div>
+        <select id="categoria" aria-label="Categoria" required></select>
+        <button type="submit">Adicionar lançamento</button>
+      </form>
+    </section>
+
+    <section class="bloco">
+      <h2>Despesas por categoria</h2>
+      <div id="resumo-cat" class="categorias"></div>
+    </section>
+
+    <section class="bloco">
+      <h2>Lançamentos do mês</h2>
+      <ul id="lista-lanc" class="lista"></ul>
+    </section>
+
+    <!-- CRUD 2: CATEGORIAS -->
+    <section class="bloco">
+      <h2>Minhas categorias</h2>
+      <form id="form-cat">
+        <div class="linha">
+          <input type="text" id="cat-nome" placeholder="Nome da categoria" maxlength="30" required>
+          <select id="cat-tipo" aria-label="Tipo da categoria">
+            <option value="despesa">Despesa</option>
+            <option value="receita">Receita</option>
+          </select>
+        </div>
+        <button type="submit">Adicionar categoria</button>
+      </form>
+      <ul id="lista-cat" class="lista"></ul>
+    </section>
+  </main>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
