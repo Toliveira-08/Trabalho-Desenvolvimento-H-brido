@@ -197,3 +197,19 @@ input[type="email"], input[type="password"] {
 
 .item.cat { grid-template-columns: 1fr auto; }
 select#cat-tipo { width: 100%; }
+
+.link {
+  background: none;
+  border: none;
+  color: var(--suave);
+  text-decoration: underline;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  text-align: right;
+  justify-self: end;
+}
+
+.link:hover {
+  color: var(--tinta);
+}
