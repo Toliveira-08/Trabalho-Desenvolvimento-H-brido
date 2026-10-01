@@ -61,6 +61,9 @@ const caminho = (nome) => collection(db, "usuarios", uid, nome);
 /* ---------------- autenticação ---------------- */
 let modo = "entrar";
 
+const campoConfirmarSenha = $("confirmar-senha");
+const btnEsqueciSenha = $("esqueci-senha");
+
 document.querySelectorAll(".abas button").forEach((b) =>
   b.addEventListener("click", () => {
     modo = b.dataset.modo;
@@ -70,6 +73,18 @@ document.querySelectorAll(".abas button").forEach((b) =>
     $("auth-botao").textContent = modo === "criar" ? "Criar conta" : "Entrar";
     $("senha").autocomplete = modo === "criar" ? "new-password" : "current-password";
     $("auth-erro").textContent = "";
+
+    // Exibe ou oculta os campos de acordo com a aba selecionada
+    if (modo === "criar") {
+      campoConfirmarSenha.hidden = false;
+      campoConfirmarSenha.required = true;
+      if (btnEsqueciSenha) btnEsqueciSenha.hidden = true;
+    } else {
+      campoConfirmarSenha.hidden = true;
+      campoConfirmarSenha.required = false;
+      campoConfirmarSenha.value = "";
+      if (btnEsqueciSenha) btnEsqueciSenha.hidden = false;
+    }
   })
 );
 
@@ -78,9 +93,19 @@ $("form-auth").addEventListener("submit", async (e) => {
   $("auth-erro").textContent = "";
   const email = $("email").value.trim();
   const senha = $("senha").value;
+  const confirmarSenha = campoConfirmarSenha.value;
+
   try {
-    if (modo === "criar") await createUserWithEmailAndPassword(auth, email, senha);
-    else await signInWithEmailAndPassword(auth, email, senha);
+    if (modo === "criar") {
+      // Validação no cliente: verifica se as senhas coincidem
+      if (senha !== confirmarSenha) {
+        $("auth-erro").textContent = "As senhas não coincidem. Digite novamente.";
+        return;
+      }
+      await createUserWithEmailAndPassword(auth, email, senha);
+    } else {
+      await signInWithEmailAndPassword(auth, email, senha);
+    }
   } catch (err) {
     $("auth-erro").textContent = msgErro(err);
   }
@@ -314,13 +339,11 @@ $("mes").value = d.toISOString().slice(0, 7);
 $("mes").addEventListener("change", assinarLancamentos);
 
 /* ---------------- redefinição de senha ---------------- */
-const btnEsqueciSenha = $("btn-esqueci-senha");
-
 if (btnEsqueciSenha) {
   btnEsqueciSenha.addEventListener("click", async (e) => {
     e.preventDefault();
     $("auth-erro").textContent = "";
-    
+
     const email = $("email").value.trim();
 
     if (!email) {
@@ -330,7 +353,7 @@ if (btnEsqueciSenha) {
 
     try {
       await sendPasswordResetEmail(auth, email);
-      alert(`E-mail enviado para ${email}! Verifique a sua caixa de entrada para redefinir a senha.`);
+      alert(`E-mail de redefinição enviado para ${email}! Verifique a sua caixa de entrada e spam.`);
     } catch (err) {
       $("auth-erro").textContent = msgErro(err);
     }
