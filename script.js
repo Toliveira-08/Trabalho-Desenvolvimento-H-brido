@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/fireba
 import {
   getAuth, onAuthStateChanged, signOut,
   createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {
   getFirestore, collection, addDoc, deleteDoc, doc, query, where, orderBy,
@@ -311,3 +312,27 @@ d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
 $("data").value = d.toISOString().slice(0, 10);
 $("mes").value = d.toISOString().slice(0, 7);
 $("mes").addEventListener("change", assinarLancamentos);
+
+/* ---------------- redefinição de senha ---------------- */
+const btnEsqueciSenha = $("btn-esqueci-senha");
+
+if (btnEsqueciSenha) {
+  btnEsqueciSenha.addEventListener("click", async (e) => {
+    e.preventDefault();
+    $("auth-erro").textContent = "";
+    
+    const email = $("email").value.trim();
+
+    if (!email) {
+      $("auth-erro").textContent = "Digite o seu e-mail acima para redefinir a senha.";
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert(`E-mail enviado para ${email}! Verifique a sua caixa de entrada para redefinir a senha.`);
+    } catch (err) {
+      $("auth-erro").textContent = msgErro(err);
+    }
+  });
+}
