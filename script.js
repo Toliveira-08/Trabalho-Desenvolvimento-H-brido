@@ -102,7 +102,16 @@ $("form-auth").addEventListener("submit", async (e) => {
         $("auth-erro").textContent = "As senhas não coincidem. Digite novamente.";
         return;
       }
+      // 1. Cria a conta
       await createUserWithEmailAndPassword(auth, email, senha);
+      
+      // 2. Desloga imediatamente para exigir o login em seguida
+      await signOut(auth);
+      
+      alert("Conta criada com sucesso! Por favor, faça o login.");
+      
+      // Opcional: muda a aba visualmente para "entrar" para facilitar para o usuário
+      document.querySelector('.abas button[data-modo="entrar"]').click();
     } else {
       await signInWithEmailAndPassword(auth, email, senha);
     }
