@@ -55,6 +55,7 @@ let categorias = [];
 let lancamentos = [];
 let semeado = false;
 let cancelar = []; // funções para parar os listeners
+let ignorarLoginAutomatico = false; // Trava para evitar o piscar da tela ao criar conta
 
 const caminho = (nome) => collection(db, "usuarios", uid, nome);
 
@@ -102,6 +103,10 @@ $("form-auth").addEventListener("submit", async (e) => {
         $("auth-erro").textContent = "As senhas não coincidem. Digite novamente.";
         return;
       }
+
+      // Ativa a trava para o onAuthStateChanged ignorar o login automático pós-criação
+      ignorarLoginAutomatico = true;
+
       // 1. Cria a conta
       await createUserWithEmailAndPassword(auth, email, senha);
       
@@ -110,12 +115,17 @@ $("form-auth").addEventListener("submit", async (e) => {
       
       alert("Conta criada com sucesso! Por favor, faça o login.");
       
-      // Opcional: muda a aba visualmente para "entrar" para facilitar para o usuário
+      // Reseta o form e muda a aba visualmente para "entrar"
+      $("form-auth").reset();
       document.querySelector('.abas button[data-modo="entrar"]').click();
+      
+      // Libera a trava novamente
+      ignorarLoginAutomatico = false;
     } else {
       await signInWithEmailAndPassword(auth, email, senha);
     }
   } catch (err) {
+    ignorarLoginAutomatico = false; // Garante que desliga a trava se ocorrer erro
     $("auth-erro").textContent = msgErro(err);
   }
 });
@@ -123,6 +133,9 @@ $("form-auth").addEventListener("submit", async (e) => {
 $("sair").addEventListener("click", () => signOut(auth));
 
 onAuthStateChanged(auth, (user) => {
+  // Ignora o evento de login automático logo após criar a conta
+  if (ignorarLoginAutomatico) return;
+
   cancelar.forEach((f) => f());
   cancelar = [];
   categorias = [];
