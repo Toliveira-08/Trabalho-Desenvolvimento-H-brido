@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/fireba
 import {
   getAuth, onAuthStateChanged, signOut,
   createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {
   getFirestore, collection, addDoc, deleteDoc, doc, query, where, orderBy,
@@ -10,10 +11,12 @@ import {
 
 /* ============ 1) COLE AQUI A CONFIGURAÇÃO DO SEU PROJETO FIREBASE ============ */
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  projectId: "SEU_PROJETO",
-  appId: "SEU_APP_ID",
+  apiKey: "AIzaSyDaYUTvG_pmdjFF-RKuhgGYuTQxxuFVAK4",
+  authDomain: "controle-de-gastos-dh-7a4e7.firebaseapp.com",
+  projectId: "controle-de-gastos-dh-7a4e7",
+  storageBucket: "controle-de-gastos-dh-7a4e7.firebasestorage.app",
+  messagingSenderId: "718649884365",
+  appId: "1:718649884365:web:74a76d80c8196d508bf384"
 };
 /* =============================================================================== */
 
@@ -52,11 +55,15 @@ let categorias = [];
 let lancamentos = [];
 let semeado = false;
 let cancelar = []; // funções para parar os listeners
+let ignorarLoginAutomatico = false; // Trava para evitar o piscar da tela ao criar conta
 
 const caminho = (nome) => collection(db, "usuarios", uid, nome);
 
 /* ---------------- autenticação ---------------- */
 let modo = "entrar";
+
+const campoConfirmarSenha = $("confirmar-senha");
+const btnEsqueciSenha = $("esqueci-senha");
 
 document.querySelectorAll(".abas button").forEach((b) =>
   b.addEventListener("click", () => {
@@ -67,6 +74,18 @@ document.querySelectorAll(".abas button").forEach((b) =>
     $("auth-botao").textContent = modo === "criar" ? "Criar conta" : "Entrar";
     $("senha").autocomplete = modo === "criar" ? "new-password" : "current-password";
     $("auth-erro").textContent = "";
+
+    // Exibe ou oculta os campos de acordo com a aba selecionada
+    if (modo === "criar") {
+      campoConfirmarSenha.hidden = false;
+      campoConfirmarSenha.required = true;
+      if (btnEsqueciSenha) btnEsqueciSenha.hidden = true;
+    } else {
+      campoConfirmarSenha.hidden = true;
+      campoConfirmarSenha.required = false;
+      campoConfirmarSenha.value = "";
+      if (btnEsqueciSenha) btnEsqueciSenha.hidden = false;
+    }
   })
 );
 
@@ -75,10 +94,38 @@ $("form-auth").addEventListener("submit", async (e) => {
   $("auth-erro").textContent = "";
   const email = $("email").value.trim();
   const senha = $("senha").value;
+  const confirmarSenha = campoConfirmarSenha.value;
+
   try {
-    if (modo === "criar") await createUserWithEmailAndPassword(auth, email, senha);
-    else await signInWithEmailAndPassword(auth, email, senha);
+    if (modo === "criar") {
+      // Validação no cliente: verifica se as senhas coincidem
+      if (senha !== confirmarSenha) {
+        $("auth-erro").textContent = "As senhas não coincidem. Digite novamente.";
+        return;
+      }
+
+      // Ativa a trava para o onAuthStateChanged ignorar o login automático pós-criação
+      ignorarLoginAutomatico = true;
+
+      // 1. Cria a conta
+      await createUserWithEmailAndPassword(auth, email, senha);
+      
+      // 2. Desloga imediatamente para exigir o login em seguida
+      await signOut(auth);
+      
+      alert("Conta criada com sucesso! Por favor, faça o login.");
+      
+      // Reseta o form e muda a aba visualmente para "entrar"
+      $("form-auth").reset();
+      document.querySelector('.abas button[data-modo="entrar"]').click();
+      
+      // Libera a trava novamente
+      ignorarLoginAutomatico = false;
+    } else {
+      await signInWithEmailAndPassword(auth, email, senha);
+    }
   } catch (err) {
+    ignorarLoginAutomatico = false; // Garante que desliga a trava se ocorrer erro
     $("auth-erro").textContent = msgErro(err);
   }
 });
@@ -86,6 +133,9 @@ $("form-auth").addEventListener("submit", async (e) => {
 $("sair").addEventListener("click", () => signOut(auth));
 
 onAuthStateChanged(auth, (user) => {
+  // Ignora o evento de login automático logo após criar a conta
+  if (ignorarLoginAutomatico) return;
+
   cancelar.forEach((f) => f());
   cancelar = [];
   categorias = [];
@@ -309,3 +359,25 @@ d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
 $("data").value = d.toISOString().slice(0, 10);
 $("mes").value = d.toISOString().slice(0, 7);
 $("mes").addEventListener("change", assinarLancamentos);
+
+/* ---------------- redefinição de senha ---------------- */
+if (btnEsqueciSenha) {
+  btnEsqueciSenha.addEventListener("click", async (e) => {
+    e.preventDefault();
+    $("auth-erro").textContent = "";
+
+    const email = $("email").value.trim();
+
+    if (!email) {
+      $("auth-erro").textContent = "Digite o seu e-mail acima para redefinir a senha.";
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert(`E-mail de redefinição enviado para ${email}! Verifique a sua caixa de entrada e spam.`);
+    } catch (err) {
+      $("auth-erro").textContent = msgErro(err);
+    }
+  });
+}
