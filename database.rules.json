@@ -1,0 +1,42 @@
+{
+  "rules": {
+    "forum": {
+      "posts": {
+        ".read": "auth != null",
+        "$postId": {
+          ".write": "auth != null && ((!data.exists() && newData.exists()) || (data.exists() && !newData.exists() && data.child('autorUid').val() === auth.uid))",
+          ".validate": "newData.hasChildren(['titulo','autorUid','autorEmail','criadoEm']) && newData.child('autorUid').val() === auth.uid && newData.child('criadoEm').val() === now",
+          "titulo": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 120" },
+          "texto": { ".validate": "newData.isString() && newData.val().length <= 2000" },
+          "autorUid": { ".validate": "newData.isString()" },
+          "autorEmail": { ".validate": "newData.isString()" },
+          "criadoEm": { ".validate": "newData.isNumber()" },
+          "$outro": { ".validate": false }
+        }
+      },
+      "votos": {
+        ".read": "auth != null",
+        "$postId": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid",
+            ".validate": "newData.val() === 1 || newData.val() === -1"
+          }
+        }
+      },
+      "comentarios": {
+        ".read": "auth != null",
+        "$postId": {
+          "$comId": {
+            ".write": "auth != null && ((!data.exists() && newData.exists()) || (data.exists() && !newData.exists() && data.child('autorUid').val() === auth.uid))",
+            ".validate": "newData.hasChildren(['texto','autorUid','autorEmail','criadoEm']) && newData.child('autorUid').val() === auth.uid && newData.child('criadoEm').val() === now",
+            "texto": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 500" },
+            "autorUid": { ".validate": "newData.isString()" },
+            "autorEmail": { ".validate": "newData.isString()" },
+            "criadoEm": { ".validate": "newData.isNumber()" },
+            "$outro": { ".validate": false }
+          }
+        }
+      }
+    }
+  }
+}

@@ -11,6 +11,7 @@ const ERROS = {
   "auth/too-many-requests": "Muitas tentativas. Aguarde um pouco e tente de novo.",
   "auth/network-request-failed": "Sem conexão. Verifique sua internet.",
   "permission-denied": "Sem permissão. Confira as regras do Firestore.",
+  PERMISSION_DENIED: "Sem permissão. Confira as regras do Realtime Database.",
 };
 
 export const msgErro = (e) => ERROS[e.code] || "Algo deu errado. Tente novamente.";
@@ -23,3 +24,20 @@ export function hoje() {
 }
 
 export const mesAtual = () => hoje().slice(0, 7);
+
+// "ana@email.com" -> "ana"
+export const nomeDe = (email) => (email || "anônimo").split("@")[0];
+
+// Tempo relativo em português ("há 5 min")
+export function tempoAtras(ts) {
+  if (!ts) return "agora";
+  const s = Math.round((Date.now() - ts) / 1000);
+  if (s < 60) return "agora";
+  const m = Math.floor(s / 60);
+  if (m < 60) return `há ${m} min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `há ${h} h`;
+  const d = Math.floor(h / 24);
+  if (d < 30) return `há ${d} d`;
+  return new Date(ts).toLocaleDateString("pt-BR");
+}
