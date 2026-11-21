@@ -25,10 +25,9 @@ export function hoje() {
 
 export const mesAtual = () => hoje().slice(0, 7);
 
-// "ana@email.com" -> "ana"
+
 export const nomeDe = (email) => (email || "anônimo").split("@")[0];
 
-// Tempo relativo em português ("há 5 min")
 export function tempoAtras(ts) {
   if (!ts) return "agora";
   const s = Math.round((Date.now() - ts) / 1000);
@@ -41,3 +40,4 @@ export function tempoAtras(ts) {
   if (d < 30) return `há ${d} d`;
   return new Date(ts).toLocaleDateString("pt-BR");
 }
+export const idDaConversa = (uidA, uidB) => [uidA, uidB].sort().join("_");
