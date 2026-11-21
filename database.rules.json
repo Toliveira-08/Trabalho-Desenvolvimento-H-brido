@@ -37,6 +37,33 @@
           }
         }
       }
+    },
+    "chats":{"$chatId": {
+    ".read": "auth != null && ($chatId.beginsWith(auth.uid + '_') || $chatId.endsWith('_' + auth.uid))",
+    "mensagens": {
+      "$msgId": {
+        ".write": "auth != null && ($chatId.beginsWith(auth.uid + '_') || $chatId.endsWith('_' + auth.uid)) && !data.exists() && newData.exists()",
+        ".validate": "newData.hasChildren(['uid','texto','criadoEm']) && newData.child('uid').val() === auth.uid && newData.child('criadoEm').val() === now",
+        "uid": { ".validate": "newData.isString()" },
+        "texto": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 500" },
+        "criadoEm": { ".validate": "newData.isNumber()" },
+        "$outro": { ".validate": false }
+      }
     }
+  }
+},
+    "userChats": {"$uid": {
+    ".read": "auth != null && auth.uid === $uid",
+    "$chatId": {
+      ".write": "auth != null && ($uid === auth.uid || ($chatId.contains(auth.uid) && $chatId.contains($uid)))",
+      ".validate": "newData.hasChildren(['comUid','comEmail','ultima','atualizadoEm'])",
+      "comUid": { ".validate": "newData.isString()" },
+      "comEmail": { ".validate": "newData.isString()" },
+      "ultima": { ".validate": "newData.isString() && newData.val().length <= 80" },
+      "atualizadoEm": { ".validate": "newData.isNumber()" },
+      "$outro": { ".validate": false }
+    }
+  }
+}
   }
 }
