@@ -2,7 +2,7 @@
 
 App web para controlar receitas e despesas pessoais, com login por usuário e uma comunidade com chat ao vivo. Feito com **React (Vite)** e **Firebase**.
 
-- **App publicado:** _(colar aqui o link do Netlify)_
+- **App publicado:** https://trabalho-desenvolvimento-h-brido.netlify.app.
 - **Código-fonte:** https://github.com/Toliveira-08/Trabalho-Desenvolvimento-H-brido/tree/feature/chat
 
 ## Funcionalidades
