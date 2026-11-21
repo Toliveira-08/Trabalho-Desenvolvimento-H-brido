@@ -1,0 +1,115 @@
+/* ---- Bolinha flutuante ---- */
+.bolinha {
+  position: fixed;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #14241f;
+  border: 1px solid rgba(20, 36, 31, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 50;
+  transition: left 0.2s ease, top 0.2s ease, transform 0.1s ease;
+}
+.bolinha svg { width: 26px; height: 26px; pointer-events: none; }
+.bolinha.arrastando { cursor: grabbing; transition: none; transform: scale(1.1); }
+
+/* ---- Comunidade ---- */
+textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px 12px;
+  background: var(--fundo);
+  border: 1px solid var(--linha);
+  border-radius: 8px;
+  font: inherit;
+  color: inherit;
+  resize: vertical;
+}
+
+.forum-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+.forum-tabs button {
+  padding: 9px; background: none; border: 1px solid var(--linha);
+  border-radius: 8px; cursor: pointer;
+}
+.forum-tabs button[aria-selected="true"] {
+  background: var(--destaque); color: var(--sobre-destaque); border-color: var(--destaque);
+}
+
+.voltar { margin-bottom: 12px; }
+
+.post { display: grid; grid-template-columns: 44px 1fr; gap: 12px; }
+
+.votos { display: flex; flex-direction: column; align-items: center; gap: 2px; font-weight: 600; }
+.votos button {
+  background: none; border: 0; cursor: pointer; color: var(--suave);
+  font-size: 1rem; line-height: 1; padding: 4px 8px; border-radius: 6px;
+}
+.votos button:hover { background: var(--fundo); }
+.votos .cima[aria-pressed="true"] { color: var(--receita); }
+.votos .baixo[aria-pressed="true"] { color: var(--despesa); }
+
+.post-titulo {
+  background: none; border: 0; padding: 0; text-align: left;
+  font-weight: 600; font-size: 1.05rem; cursor: pointer; color: inherit;
+  overflow-wrap: anywhere;
+}
+.post-titulo:hover { text-decoration: underline; }
+.post-titulo-aberto { margin: 0; font-size: 1.2rem; overflow-wrap: anywhere; }
+
+.post-texto {
+  margin: 6px 0 0; color: var(--suave); white-space: pre-wrap; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.post-texto.completo { display: block; color: var(--tinta); }
+
+.post-meta {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  margin-top: 8px; font-size: 0.8rem; color: var(--suave);
+}
+.post-meta button {
+  background: none; border: 0; padding: 0; cursor: pointer; color: inherit; font: inherit;
+}
+.post-meta button:hover { color: var(--tinta); text-decoration: underline; }
+
+.comentario { padding: 12px 0; border-bottom: 1px solid var(--linha); }
+.comentario:last-child { border-bottom: 0; }
+.comentario .post-meta { margin: 0; }
+.comentario-texto { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bloco .lista { margin-top: 12px; }
+
+/* ---- Chat privado ---- */
+.chat-mensagens {
+  list-style: none; margin: 0 0 12px; padding: 0;
+  height: 50vh; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.balao { max-width: 80%; padding: 8px 12px; border-radius: 12px; overflow-wrap: anywhere; }
+.balao p { margin: 0; white-space: pre-wrap; }
+.balao small { display: block; margin-top: 2px; font-size: 0.7rem; opacity: 0.7; }
+.balao.minha { align-self: flex-end; background: var(--receita); color: #fff; }
+.balao.dele { align-self: flex-start; background: var(--fundo); border: 1px solid var(--linha); }
+.chat-form { grid-template-columns: 1fr auto; }
+.chat-form button { padding: 0 18px; }
+
+/* ---- Caixa de entrada (aba Conversas) ---- */
+.conversas { list-style: none; margin: 0; padding: 0; }
+.conversa {
+  width: 100%; display: grid; gap: 2px; text-align: left;
+  padding: 12px 14px; margin-bottom: 10px;
+  background: var(--papel); border: 1px solid var(--linha); border-radius: 12px;
+  cursor: pointer;
+}
+.conversa:hover { border-color: var(--suave); }
+.conversa-topo { display: flex; justify-content: space-between; gap: 8px; }
+.conversa small { color: var(--suave); }
+.conversa .ultima {
+  color: var(--suave); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
