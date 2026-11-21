@@ -2,7 +2,7 @@ import { useState } from "react";
 import Votos from "./Votos.jsx";
 import { nomeDe, tempoAtras } from "../utils";
 
-export default function PostDetalhe({ post, forum, user, fechar }) {
+export default function PostDetalhe({ post, forum, user, fechar, onConversar }) {
   const [texto, setTexto] = useState("");
   const comentarios = forum.comentariosDe(post.id);
 
@@ -29,6 +29,11 @@ export default function PostDetalhe({ post, forum, user, fechar }) {
           <div className="post-meta">
             <span>por {nomeDe(post.autorEmail)}</span>
             <span>{tempoAtras(post.criadoEm)}</span>
+            {post.autorUid !== user.uid && (
+              <button type="button" onClick={() => onConversar({ uid: post.autorUid, email: post.autorEmail })}>
+                Falar com usuário
+              </button>
+            )}
             {post.autorUid === user.uid && <button type="button" onClick={excluirPost}>Excluir</button>}
           </div>
         </div>

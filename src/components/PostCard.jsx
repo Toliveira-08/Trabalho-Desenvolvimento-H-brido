@@ -1,7 +1,7 @@
 import Votos from "./Votos.jsx";
 import { nomeDe, tempoAtras } from "../utils";
 
-export default function PostCard({ post, forum, user, onAbrir }) {
+export default function PostCard({ post, forum, user, onAbrir, onConversar }) {
   const meu = post.autorUid === user.uid;
   const n = post.nComentarios;
 
@@ -15,6 +15,11 @@ export default function PostCard({ post, forum, user, onAbrir }) {
           <span>por {nomeDe(post.autorEmail)}</span>
           <span>{tempoAtras(post.criadoEm)}</span>
           <button type="button" onClick={onAbrir}>{n} {n === 1 ? "comentário" : "comentários"}</button>
+          {!meu && (
+            <button type="button" onClick={() => onConversar({ uid: post.autorUid, email: post.autorEmail })}>
+              Falar com usuário
+            </button>
+          )}
           {meu && (
             <button type="button" onClick={() => window.confirm("Excluir esta publicação?") && forum.apagarPost(post.id)}>
               Excluir

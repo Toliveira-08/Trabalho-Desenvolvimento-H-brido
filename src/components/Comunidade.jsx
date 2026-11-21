@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useForum } from "../hooks/useForum";
 import PostCard from "./PostCard.jsx";
 import PostDetalhe from "./PostDetalhe.jsx";
+import ChatPrivado from "./ChatPrivado.jsx";
 
 export default function Comunidade({ user, voltar }) {
   const [aviso, setAviso] = useState("");
@@ -9,6 +10,7 @@ export default function Comunidade({ user, voltar }) {
   const [aberto, setAberto] = useState(null);
   const [titulo, setTitulo] = useState("");
   const [texto, setTexto] = useState("");
+  const [conversa, setConversa] = useState(null); // { uid, email } de quem vamos conversar
   const forum = useForum(user, setAviso);
 
   const ordenados = useMemo(() => {
@@ -29,6 +31,11 @@ export default function Comunidade({ user, voltar }) {
     }
   }
 
+  // Conversa aberta: mostra o chat no lugar da lista (fica depois de todos os hooks)
+  if (conversa) {
+    return <ChatPrivado user={user} outro={conversa} voltar={() => setConversa(null)} />;
+  }
+
   return (
     <main className="app">
       <header className="topo">
@@ -39,7 +46,7 @@ export default function Comunidade({ user, voltar }) {
       <p className="erro" role="alert">{aviso}</p>
 
       {postAberto ? (
-        <PostDetalhe post={postAberto} forum={forum} user={user} fechar={() => setAberto(null)} />
+        <PostDetalhe post={postAberto} forum={forum} user={user} fechar={() => setAberto(null)} onConversar={setConversa} />
       ) : (
         <>
           <section className="bloco">
@@ -67,7 +74,7 @@ export default function Comunidade({ user, voltar }) {
             <p className="vazio">Nenhuma publicação ainda. Faça a primeira!</p>
           )}
           {ordenados.map((p) => (
-            <PostCard key={p.id} post={p} forum={forum} user={user} onAbrir={() => setAberto(p.id)} />
+            <PostCard key={p.id} post={p} forum={forum} user={user} onAbrir={() => setAberto(p.id)} onConversar={setConversa} />
           ))}
         </>
       )}
